@@ -62,7 +62,7 @@ jobs:
       pull_request: ${{ github.event_name == 'pull_request' }}
       step: unit-test
       attestations: "git github environment"
-      command: go test -v -coverprofile=profile.cov -covermode=atomic ./...
+      command: go test -v -coverprofile="profile.cov" -covermode=atomic ./...
       artifact-upload-name: profile.cov
       artifact-upload-path: profile.cov
 
