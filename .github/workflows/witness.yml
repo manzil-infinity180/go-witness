@@ -45,7 +45,11 @@ permissions:
 
 jobs:
     witness:
-        runs-on: ubuntu-latest
+        strategy:
+          matrix:
+            os: [ubuntu-latest, windows-latest]
+
+        runs-on: ${{ matrix.os }}
         permissions:
             contents: read
             id-token: write
