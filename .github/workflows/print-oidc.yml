@@ -1,6 +1,8 @@
 name: Print GH OIDC Info
 
-on: [workflow_dispatch]
+on:
+    pull_request:
+        types: [opened, reopened, synchronize]
 
 jobs:
   oidc-info:
