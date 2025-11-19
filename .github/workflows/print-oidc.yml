@@ -1,0 +1,29 @@
+name: Print GH OIDC Info
+
+on: [workflow_dispatch]
+
+jobs:
+  oidc-info:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+      - name: Print GitHub OIDC env vars
+        run: |
+          echo "ACTIONS_ID_TOKEN_REQUEST_URL=$ACTIONS_ID_TOKEN_REQUEST_URL"
+          echo "ACTIONS_ID_TOKEN_REQUEST_TOKEN=$ACTIONS_ID_TOKEN_REQUEST_TOKEN"
+
+      - name: Request the actual token
+        run: |
+          curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+               "$ACTIONS_ID_TOKEN_REQUEST_URL" \
+               > token.json
+          
+          echo "Token downloaded:"
+          cat token.json
+
+      - name: Upload token artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: oidc-token
+          path: token.json

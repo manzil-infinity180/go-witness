@@ -82,6 +82,29 @@ func TestNewClient(t *testing.T) {
 	require.NotNil(t, client)
 }
 
+func TestGitHubActionsTokenTimeout(t *testing.T) {
+	// Set up GitHub Actions environment
+	os.Setenv("GITHUB_ACTIONS", "true")
+	os.Setenv("ACTIONS_ID_TOKEN_REQUEST_URL", "https://example.com/token")
+	os.Setenv("ACTIONS_ID_TOKEN_REQUEST_TOKEN", "fake-token")
+
+	fsp := New(
+		WithFulcioURL("https://fulcio.sigstore.dev"),
+		WithOidcIssuer("https://oauth2.sigstore.dev/auth"),
+		WithOidcClientID("sigstore"),
+	)
+
+	start := time.Now()
+	_, err := fsp.Signer(context.Background())
+	require.Error(t, err)
+	elapsed := time.Since(start)
+
+	// This should fail quickly with our fake URL, not after 2 minutes
+	if elapsed > 30*time.Second {
+		t.Errorf("Signer took %v, suggesting interactive OAuth timeout", elapsed)
+	}
+}
+
 type dummyCAClientService struct {
 	client fulciopb.CAClient
 	server *grpc.Server
